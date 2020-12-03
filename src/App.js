@@ -1,47 +1,19 @@
 import './App.css';
 import React, {useState, useEffect} from 'react';
-import {move} from "formik";
 import axios from 'axios';
 import capitalize from "capitalize-the-first-letter";
+import ApiHelper from "./ApiHelper";
 
-class Helper extends React.Component {
-    constructor() {
-        super();
-        this.state = {
-            pokemon: {},
-            pokemonInfo: {},
-            pokemonEvolution: {}
-        }
-    }
-    fetch = (pokemon) => {
-        let pokemonName = pokemon.toLowerCase();
-/*
-        pokemonId ? pokemonName = pokemonId : pokemonName = pokemonName.toLowerCase();
-*/
-        axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`)
-            .then(response => {
-                this.setState({pokemon: response.data})
-            });
-        axios.get(`https://pokeapi.co/api/v2/pokemon-species/${pokemonName}`)
-            .then(response => {
-                this.setState({pokemonInfo: response.data})
-                axios.get(response.data.evolution_chain.url)
-                    .then(response => {
-                        this.setState({pokemonInfo: response.data})
-                    })
-            });
-    }
-
-}
 function App() {
     // flags
-    //const [isLoading, setLoading] = useState(true);
+    const [isLoaded, setLoaded] = useState(false);
     const [isInitiazed, setInitialized] = useState(false);
     // state
     const [isShiny, setShiny] = useState(false);
     const [pokemonName, setpokemonName] = useState('');
+    const [pokemonObject, setPokemonObject] = useState()
 
-    /*useEffect(() => setPokemonId(''), [pokemonName])
+    /*
     function previousPokemon() {
         setPokemonId(previousId => previousId - 1)
     }
@@ -49,9 +21,22 @@ function App() {
         setPokemonId(previousId => previousId + 1)
     }
 */
-    const onSubmit = (event) => {
+
+    const Api = new ApiHelper(pokemonName, isShiny)
+
+    const onSubmit =  (event) => {
+        setPokemonObject({baseInfo, sideInfo})
         event.preventDefault()
     }
+
+    useEffect(() => {
+        setInitialized(true);
+        setLoaded(true)
+    }, [pokemonObject])
+
+    useEffect(() => {
+        setInitialized(false);
+        setLoaded(false)})
 
     return (
         <div>
@@ -70,40 +55,45 @@ function App() {
                 />
                 <button>search!</button>
             </form>
-
-            <PokedexContainer name={pokemonName}/>
-
-                {/*{isInitiazed ?
+                {isInitiazed ?
                     <div>
                         <h1>My Fancy 'Dex</h1>
-                        {isLoading ? <Loader />:
-                            <PokedexContainer main={fetchMainData} side={fetchSideData} shiny={isShiny}
-                                              evolution={evolutionChain}/>
+                        {isLoaded ? <Loader />
+                        : 'hello' /*<PokedexContainer object={pokemonObject}/>*/
                         }
-                        <button onClick={previousPokemon}>
+                        {/*<button onClick={previousPokemon}>
                             Previous
                         </button>
                         <button onClick={nextPokemon}>
                             Next
-                        </button>
+                        </button>*/}
                     </div>
                     : ''
-                }*/}
+                }
         </div>
     );
 }
 
-const PokedexContainer = ({name}) => {
-    const helper = new Helper()
-    const pokemonObject = helper.fetch(name);
-    console.log(pokemonObject)
+/*const PokedexContainer = ({mainInfo, sideInfo}) => {
     return(
         <div>
-            <h1> {name}</h1>
+            <h1> {mainInfo.name}</h1>
         </div>
     )
 
+}*/
+
+
+const Loader = () => {
+    return(
+        <div>
+            <p>Loading...</p>
+        </div>
+    )
 }
+
+export default App;
+
 
 /*const PokedexContainer = ({main, side, shiny, evolution}) => {
     const {genera} = side;
@@ -120,15 +110,9 @@ const PokedexContainer = ({name}) => {
     )
 };*/
 
-/*
-const Loader = () => {
-    return(
-        <div>
-            <p>Loading...</p>
-        </div>
-    )
-}
 
+
+/*
 const PokemonDisplay = ({data}) => {
     const {sprites, name, id, shiny, genera, evolution} = data;
     const spriteArray = [];
@@ -186,4 +170,4 @@ const MoveList = ({moves}) => {
 }
 */
 
-export default App;
+
