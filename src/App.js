@@ -9,9 +9,9 @@ function App() {
     const [isLoading, setLoading] = useState(false);
     const [isInitiazed, setInitialized] = useState(false);
     // state
-    const [isShiny, setShiny] = useState(false); // niet meer onsubmit -
     const [pokemonName, setpokemonName] = useState('charmeleon');
     const [pokemon, setPokemon] = useState()
+    const [evolutions, setEvolutions] = useState()
 
     /*
     function previousPokemon() {
@@ -27,8 +27,18 @@ function App() {
     const getPokemonData = (name) => {
         client.getPokemonByName(name).then(pokemon => {
             setPokemon(pokemon)
+            getEvolutionData(pokemon.evolutions)
+        })
+    }
+    const getEvolutionData = (array) => {
+        client.getSpritesByArray(array).then(evolutions =>
+        {
+            setEvolutions(evolutions)
             setLoading(false)
         })
+
+
+
     }
 
     const onSubmit = (event) => {
@@ -54,7 +64,7 @@ function App() {
                     <div>
                         <h1>My Fancy 'Dex</h1>
                         {isLoading ? <Loader />
-                        : <PokedexContainer pokemon={pokemon}/>
+                        : <PokedexContainer pokemon={pokemon} evolutions={evolutions}/>
                         }
 
 
@@ -71,8 +81,9 @@ function App() {
     );
 }
 
-const PokedexContainer = ({pokemon}) => {
+const PokedexContainer = ({pokemon,evolutions}) => {
     const [isShiny, setShiny] = useState(false)
+    console.log(evolutions)
     return(
         <div>
             <h1> #{pokemon.id} {capitalize(pokemon.name)}</h1>
@@ -85,13 +96,19 @@ const PokedexContainer = ({pokemon}) => {
                     setShiny(!isShiny)
                 }}
             />
+            <br/>
+
             {isShiny ? pokemon.img_shiny.map(img => <img src={img} alt=""/>)
                 : pokemon.img.map(img => <img src={img} alt=""/>)}
-{/*
-            <img src={isShiny ? pokemon.img_shiny : pokemon.img} alt=""/>
-*/}
-            {console.log(pokemon.moves)}
+                <br/>
+            {evolutions.map(url => <img src={url} alt=""/>)}
+            <h3>{pokemon.flavor_text}</h3>
             <MoveList props={pokemon.moves} />
+
+
+
+
+
         </div>
     )
 
