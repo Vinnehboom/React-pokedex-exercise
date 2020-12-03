@@ -1,17 +1,17 @@
 import './App.css';
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import capitalize from "capitalize-the-first-letter";
-import ApiHelper from "./ApiHelper";
+import Client from "./ApiHelper";
+import capitalize from 'capitalize-the-first-letter'
 
 function App() {
     // flags
-    const [isLoaded, setLoaded] = useState(false);
+    const [isLoading, setLoading] = useState(false);
     const [isInitiazed, setInitialized] = useState(false);
     // state
-    const [isShiny, setShiny] = useState(false);
-    const [pokemonName, setpokemonName] = useState('');
-    const [pokemonObject, setPokemonObject] = useState()
+    const [isShiny, setShiny] = useState(false); // niet meer onsubmit -
+    const [pokemonName, setpokemonName] = useState('charmeleon');
+    const [pokemon, setPokemon] = useState()
 
     /*
     function previousPokemon() {
@@ -22,21 +22,21 @@ function App() {
     }
 */
 
-    const Api = new ApiHelper(pokemonName, isShiny)
+    const client = new Client()
 
-    const onSubmit =  (event) => {
-        setPokemonObject({baseInfo, sideInfo})
-        event.preventDefault()
+    const getPokemonData = (name) => {
+        client.getPokemonByName(name).then(pokemon => {
+            setPokemon(pokemon)
+            setLoading(false)
+        })
     }
 
-    useEffect(() => {
-        setInitialized(true);
-        setLoaded(true)
-    }, [pokemonObject])
-
-    useEffect(() => {
-        setInitialized(false);
-        setLoaded(false)})
+    const onSubmit = (event) => {
+        setInitialized(true)
+        setLoading(true)
+        getPokemonData(pokemonName)
+        event.preventDefault()
+    }
 
     return (
         <div>
@@ -47,20 +47,17 @@ function App() {
                     value={pokemonName}
                     onChange={e => setpokemonName(e.target.value)}
                 />
-                <input
-                    type="checkbox"
-                    name={isShiny}
-                    value={isShiny}
-                    onChange={e => setShiny(e.target.value)}
-                />
+
                 <button>search!</button>
             </form>
                 {isInitiazed ?
                     <div>
                         <h1>My Fancy 'Dex</h1>
-                        {isLoaded ? <Loader />
-                        : 'hello' /*<PokedexContainer object={pokemonObject}/>*/
+                        {isLoading ? <Loader />
+                        : <PokedexContainer pokemon={pokemon}/>
                         }
+
+
                         {/*<button onClick={previousPokemon}>
                             Previous
                         </button>
@@ -74,14 +71,53 @@ function App() {
     );
 }
 
-/*const PokedexContainer = ({mainInfo, sideInfo}) => {
+const PokedexContainer = ({pokemon}) => {
+    const [isShiny, setShiny] = useState(false)
     return(
         <div>
-            <h1> {mainInfo.name}</h1>
+            <h1> #{pokemon.id} {capitalize(pokemon.name)}</h1>
+            <h2> The {pokemon.genus}</h2>
+            <input
+                type="checkbox"
+                name={isShiny}
+                value={isShiny}
+                onChange={e => {
+                    setShiny(!isShiny)
+                }}
+            />
+            {isShiny ? pokemon.img_shiny.map(img => <img src={img} alt=""/>)
+                : pokemon.img.map(img => <img src={img} alt=""/>)}
+{/*
+            <img src={isShiny ? pokemon.img_shiny : pokemon.img} alt=""/>
+*/}
+            {console.log(pokemon.moves)}
+            <MoveList props={pokemon.moves} />
         </div>
     )
 
-}*/
+}
+
+const MoveList = ({props}) => {
+    const totalMoves = props.length
+    const movesAmount = Math.min(4, totalMoves);
+    const movesArray = []
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+    const moves = props.map(prop => prop.move.name)
+    for (let i = 0; i < movesAmount; i++) {
+        shuffleArray(moves)
+        movesArray.push(moves.pop().split('-').join(' '));
+    }
+    return (
+        <ul>
+            {movesArray.map(move => (<li>{capitalize(move)}</li>))}
+        </ul>
+    )
+}
 
 
 const Loader = () => {
@@ -153,21 +189,7 @@ const PokemonInfo = () =>
         </div>
     )
 }*!/
-
-const MoveList = ({moves}) => {
-    const totalMoves = moves.length
-    const movesAmount = Math.min(4, totalMoves);
-    const movesArray = []
-    for (let i = 0; i < movesAmount; i++) {
-        let randomNr = Math.floor(Math.random() * totalMoves);
-        movesArray.push((moves[randomNr].move.name).split('-').join(' '));
-    }
-    return (
-        <ul>
-            {movesArray.map(move => (<li>{move}</li>))}
-        </ul>
-    )
-}
 */
+
 
 
