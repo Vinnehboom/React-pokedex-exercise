@@ -11,7 +11,6 @@ function App() {
     // state
     const [pokemonName, setpokemonName] = useState('charmeleon');
     const [pokemon, setPokemon] = useState()
-    const [evolutions, setEvolutions] = useState()
 
     /*
     function previousPokemon() {
@@ -27,18 +26,8 @@ function App() {
     const getPokemonData = (name) => {
         client.getPokemonByName(name).then(pokemon => {
             setPokemon(pokemon)
-            getEvolutionData(pokemon.evolutions)
-        })
-    }
-    const getEvolutionData = (array) => {
-        client.getSpritesByArray(array).then(evolutions =>
-        {
-            setEvolutions(evolutions)
             setLoading(false)
         })
-
-
-
     }
 
     const onSubmit = (event) => {
@@ -64,7 +53,7 @@ function App() {
                     <div>
                         <h1>My Fancy 'Dex</h1>
                         {isLoading ? <Loader />
-                        : <PokedexContainer pokemon={pokemon} evolutions={evolutions}/>
+                        : <PokedexContainer pokemon={pokemon}/>
                         }
 
 
@@ -81,9 +70,8 @@ function App() {
     );
 }
 
-const PokedexContainer = ({pokemon,evolutions}) => {
+const PokedexContainer = ({pokemon}) => {
     const [isShiny, setShiny] = useState(false)
-    console.log(evolutions)
     return(
         <div>
             <h1> #{pokemon.id} {capitalize(pokemon.name)}</h1>
@@ -101,14 +89,9 @@ const PokedexContainer = ({pokemon,evolutions}) => {
             {isShiny ? pokemon.img_shiny.map(img => <img src={img} alt=""/>)
                 : pokemon.img.map(img => <img src={img} alt=""/>)}
                 <br/>
-            {evolutions.map(url => <img src={url} alt=""/>)}
+            {pokemon.evo_sprites.map(url => <img src={url} alt=""/>)}
             <h3>{pokemon.flavor_text}</h3>
             <MoveList props={pokemon.moves} />
-
-
-
-
-
         </div>
     )
 

@@ -14,8 +14,7 @@ class Client {
     }
 
 
-    parsePokemonData(mainFetch, sideFetch) {
-        console.log(this.getEvolutionLine(sideFetch.evolution_chain.url))
+    parsePokemonData(mainFetch, sideFetch, evoSprites) {
         return {
             name: mainFetch.name,
             id: mainFetch.id,
@@ -24,10 +23,8 @@ class Client {
             moves: mainFetch.moves,
             genus: this.getEnglishGenus(sideFetch),
             flavor_text: this.getRandomFlavorText(sideFetch),
-            evolutions: this.getEvolutionLine(sideFetch.evolution_chain.url)
+            evo_sprites: evoSprites
         }
-
-
     }
 
     getPokemonByName(name) {
@@ -36,54 +33,28 @@ class Client {
                 const mainData = main.data
                 return axios.get(`${this.baseURL}pokemon-species/${name}`)
                     .then(side => {
-                        return this.parsePokemonData(mainData, side.data)
-                    })
-            })
-    }
-
-   /* getSpriteByName(name) {
-        return axios.get(`${this.baseURL}pokemon/${name}`)
-            .then(main => main.data.sprites.front_default)
-    }*/
-    getSpritesByArray(array) {
-        return array.then(result => {
-            const sprites = []
-            result.forEach(evolution => {
-                axios.get(`${this.baseURL}pokemon/${evolution}`)
-                    .then(result => {
-                        sprites.push(result.data.sprites.front_default)
+                        let evoURL = side.data.evolution_chain.url
+                        const sprites = []
+                        this.getEvolutionLine(evoURL).then(result => {
+                            result.forEach(evolution => {
+                                axios.get(`${this.baseURL}pokemon/${evolution}`)
+                                    .then(result => {
+                                        sprites.push(result.data.sprites.front_default)
+                                    })
+                            })
+                        })
+                        return this.parsePokemonData(mainData, side.data, sprites)
                     })
 
             })
-            return sprites
-        })
     }
-
-    getEnglishGenus(data) {
-        let enGenus
-        data.genera.forEach(genus => {
-            if (genus.language.name === 'en') {
-                enGenus = genus.genus
-            }
-        })
-        return enGenus
-    }
-
-    getRandomFlavorText(data) {
-        let flavorText;
-        let EnglishFlavors = data.flavor_text_entries.filter(entry => entry.language.name === 'en')
-        return EnglishFlavors[Math.floor(Math.random() * EnglishFlavors.length)].flavor_text
-    }
-
-
 
     // returns array with all pokemon in evolution line
     getEvolutionLine(url) {
-         return axios.get(url)
+        return axios.get(url)
             .then(res => {
                 let evoArray = [];
                 let basePath = res.data.chain
-                console.log(basePath)
                 if (basePath.species.name) {
                     evoArray.push(basePath.species.name)
                     let path
@@ -103,9 +74,31 @@ class Client {
                 }
                 return evoArray
             })
-
     }
+
+   /* getSpriteByName(name) {
+        return axios.get(`${this.baseURL}pokemon/${name}`)
+            .then(main => main.data.sprites.front_default)
+    }*/
+
+    getEnglishGenus(data) {
+        let enGenus
+        data.genera.forEach(genus => {
+            if (genus.language.name === 'en') {
+                enGenus = genus.genus
+            }
+        })
+        return enGenus
+    }
+
+    getRandomFlavorText(data) {
+        let EnglishFlavors = data.flavor_text_entries.filter(entry => entry.language.name === 'en')
+        return EnglishFlavors[Math.floor(Math.random() * EnglishFlavors.length)].flavor_text
+    }
+
 }
+
+
 
 
 export default Client
