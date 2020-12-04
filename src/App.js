@@ -7,7 +7,7 @@ import styled from 'styled-components'
 
 import Header from "./components/Header";
 import DynamicContent from "./components/Dynamic";
-import PokedexContainer from './components/PokedexContainer'
+import PokedexContainer from './components/PokeContainer'
 
 function App() {
     // flags
@@ -15,15 +15,16 @@ function App() {
     const [isInitiazed, setInitialized] = useState(false);
     // state
     const [pokemon, setPokemon] = useState()
-/*
+
+
     function previousPokemon(pokemonId, shiny) {
         setLoading(true)
         getPokemonData(pokemonId, shiny)
     }
-*/
-    /*function nextPokemon() {
-        setPokemonId(previousId => previousId + 1)
-    }*/
+    function nextPokemon(pokemonId, shiny) {
+        setLoading(true)
+        getPokemonData(pokemonId, shiny)
+    }
     const client = new Client()
 
     const getPokemonData = (name, shiny) => {
@@ -45,7 +46,7 @@ function App() {
                 <div>
 
                     {isLoading ? <DynamicContent/>
-                        : <PokedexContainer loading={setLoading} pokemon={pokemon} /*previousPokemon={previousPokemon}*//>
+                        : <PokedexContainer loading={setLoading} pokemon={pokemon} previousPokemon={previousPokemon} nextPokemon={nextPokemon}/>
                     }
                 </div>
                 : ''

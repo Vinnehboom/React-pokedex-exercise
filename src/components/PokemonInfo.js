@@ -4,6 +4,7 @@ import {Col} from 'react-bootstrap'
 
 
 import MoveList from './MoveList'
+import PokeTypes from "./PokeTypes";
 
 //tried styled(Col)
 
@@ -19,14 +20,7 @@ const PokemonInfo = ({pokemonInfo}) => {
     return(
         <InfoContainer className={"col-7"}>
             <h2> The {genus}</h2>
-            {types.map(type => {
-                let icon = type + '.png'
-                return (<div>
-                    <h3>{type}</h3>
-                    <img src={window.location.origin + '/assets/icons/'+icon}
-                         alt=""/>
-                </div>)
-            })}
+           <PokeTypes types={types}/>
 
             <h3>{flavor_text}</h3>
             <MoveList moves={moves} />
