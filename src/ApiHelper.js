@@ -14,10 +14,12 @@ class Client {
     }
 
 
-    parsePokemonData(mainFetch, sideFetch, evoSprites) {
+    parsePokemonData(mainFetch, sideFetch, evoSprites, isShiny) {
         return {
             name: mainFetch.name,
             id: mainFetch.id,
+            types: this.getTypes(mainFetch),
+            shiny: isShiny,
             img: [mainFetch.sprites.front_default, mainFetch.sprites.back_default],
             img_shiny: [mainFetch.sprites.front_shiny, mainFetch.sprites.back_shiny],
             moves: mainFetch.moves,
@@ -27,7 +29,7 @@ class Client {
         }
     }
 
-    getPokemonByName(name) {
+    getPokemonByName(name, shiny) {
         return axios.get(`${this.baseURL}pokemon/${name}`)
             .then(main => {
                 const mainData = main.data
@@ -39,11 +41,11 @@ class Client {
                             result.forEach(evolution => {
                                 axios.get(`${this.baseURL}pokemon/${evolution}`)
                                     .then(result => {
-                                        sprites.push(result.data.sprites.front_default)
+                                        sprites.push(shiny ? result.data.sprites.front_shiny : result.data.sprites.front_default)
                                     })
                             })
                         })
-                        return this.parsePokemonData(mainData, side.data, sprites)
+                        return this.parsePokemonData(mainData, side.data, sprites, shiny)
                     })
 
             })
@@ -89,6 +91,13 @@ class Client {
             }
         })
         return enGenus
+    }
+
+    getTypes(data) {
+        let types = []
+        data.types.forEach(type => types.push(type.type.name))
+        console.log(types)
+        return types
     }
 
     getRandomFlavorText(data) {
