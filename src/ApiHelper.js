@@ -30,10 +30,10 @@ class Client {
     }
 
     getPokemonByName(name, shiny) {
-        return axios.get(`${this.baseURL}pokemon/${name}`)
+        return axios.get(`${this.baseURL}pokemon/${name.toLowerCase()}`)
             .then(main => {
                 const mainData = main.data
-                return axios.get(`${this.baseURL}pokemon-species/${name}`)
+                return axios.get(`${this.baseURL}pokemon-species/${name.toLowerCase()}`)
                     .then(side => {
                         let evoURL = side.data.evolution_chain.url
                         const sprites = []

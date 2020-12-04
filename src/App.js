@@ -5,8 +5,8 @@ import Client from "./ApiHelper";
 import capitalize from 'capitalize-the-first-letter'
 import styled from 'styled-components'
 
+import Header from "./components/Header";
 import DynamicContent from "./components/Dynamic";
-import Form from './components/SearchBar'
 import PokedexContainer from './components/PokedexContainer'
 
 function App() {
@@ -40,7 +40,7 @@ function App() {
 
     return (
         <div>
-            <Form onSubmit={onSubmit}/>
+            <Header onSubmit={onSubmit} />
             {isInitiazed ?
                 <div>
 
